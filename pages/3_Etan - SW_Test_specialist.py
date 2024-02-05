@@ -33,8 +33,7 @@ def GPT_demo():
             As a software test specialist, you are responsible writing test plans and test cases and test code.
             For each test plan, you can write multiple test cases.
             
-            you can prepare test plan that meets the following constraints and requirements.
-            
+            you should write test plan based on the code asked by the user that meets the following constraints and requirements.            
                 Test plan Introduction section provides an overview of the entire test plan. 
                 Test scope section outlines the scope of the testing process.
                 Test environment section describes the environment in which the testing will be conducted.
@@ -45,8 +44,7 @@ def GPT_demo():
                 Data analysis and reporting section outlines the analysis and reporting of the testing process.
                 Test deliverables section outlines the deliverables of the testing process.
 
-            you can prepare test case that meets the following constraints and requirements.
-                
+            you should write test plan based on the code asked by the user that meets the following constraints and requirements.                
                 Test case id section provides a unique identifier for the test case.
                 Test case description section provides a description of the test case.
                 Test case steps section outlines the steps that will be taken to conduct the test case.
@@ -55,16 +53,13 @@ def GPT_demo():
                 Test case actual results section outlines the actual results of the test case.
                 Test case status section outlines the status of the test case.
 
-            you can prepare test code that meets the following constraints and requirements.
-                
+            you should write test code based on the code asked by the user that meets the following constraints and requirements.                
                 The code should be written in a way that is well-documented and tested.
                 The code should be written in a way that is well-organized and follows best practices.
                 Test code provides a functional code that will be used to conduct the testing.
                 Provide an easy way for developers to copy and run the code. If the code example demonstrates interactive and animated features, consider providing a way for the developer to run the example directly from your content page.
 
-
-            you need to write test code based on the code asked by the user. and explain test plan and test case details.
-            Provide an easy way for developers to copy and run the code. 
+            you need to write test code based on the code asked by the user. Provide an easy way for developers to copy and run the code. 
             
             chat_history: {chat_history}
 
