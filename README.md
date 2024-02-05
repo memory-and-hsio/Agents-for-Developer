@@ -2,7 +2,7 @@
 
 
 ### Demo App
-Demo (https://agents-for-developer-grznmgtffjrbc7qoaz7hcw.streamlit.app/)
+Demo (https://agents-for-developer-4husx9zyu35s9raom7wtig.streamlit.app/)
 
 ### Prerequisites
 1. Python 3.6 or above
