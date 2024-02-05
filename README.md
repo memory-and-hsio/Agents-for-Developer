@@ -1,13 +1,12 @@
 ## Template for creating your GPT with Streamlit and OpenAI API
 
-This repository contains the code for a simple web application built with [Streamlit](https://streamlit.io/), which uses OpenAI's GPT-3 model for generating AI responses in a chat-like interface.
 
 ### Demo App
-![Demo](https://github.com/krisograbek/multibot_streamlit/assets/48050596/51e6ccc6-051a-4d3f-bb24-2dfda30419fb)
+![Demo](TBD)
 
 ### Prerequisites
 1. Python 3.6 or above
-2. An OpenAI API Key
+2. An OpenAI API Key ( https://platform.openai.com/apps )
 
 
 ### Steps to run the application
@@ -53,6 +52,9 @@ streamlit run Greetings.py
 ```
 
 Open a web browser and navigate to http://localhost:8501 to interact with the application.
+
+
+
 
 License
 This project is open source, under the terms of the MIT license.
