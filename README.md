@@ -45,6 +45,7 @@ echo OPENAI_API_KEY=your-api-key > .env
 OR
 
 Please replace your-api-key with your actual OpenAI API key.
+
 You will see exception if you don't have api key.
 
 ex. got exception. error: 1 validation error for ChatOpenAI root Did not find openai_api_key
