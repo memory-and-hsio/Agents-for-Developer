@@ -59,7 +59,8 @@ def GPT_demo():
             - Encourage developers to simplify code or add code comments instead of just explaining the complexity to you.
             - labeling the severity of your comments, differentiating required changes from guidelines or suggestions.
 
-            you need to write code review comments based on the code asked by the user.
+            you need to write code review comments based on the code asked by the user, ans suggest ways to refactor and improve code quality,
+            enhance performance, address security concerns, and align with the best practices and guidelines.
 
             chat_history: {chat_history}
 
