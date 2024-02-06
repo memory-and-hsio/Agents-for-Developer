@@ -91,7 +91,7 @@ def GPT_demo():
         # check for messages in session and create if not exists
         if "messages" not in st.session_state.keys():
             st.session_state.messages = [
-                {"role": "assistant", "content": "Hello there"}
+                {"role": "assistant", "content": "Hello there"},
             ]
 
         # display all messages
