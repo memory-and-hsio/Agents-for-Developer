@@ -80,10 +80,12 @@ def GPT_demo():
             """
             % e
         )
+       st.stop()
 
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
+
 
 # get icon from https://emojipedia.org/robot
 st.set_page_config(

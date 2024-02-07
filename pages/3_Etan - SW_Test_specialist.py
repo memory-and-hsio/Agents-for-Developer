@@ -116,6 +116,7 @@ def GPT_demo():
             """
             % e
         )
+       st.stop()
 
 
 load_dotenv()
