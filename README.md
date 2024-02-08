@@ -2,7 +2,7 @@
 
 
 ### Demo App
-Demo (https://agents-for-developer-grznmgtffjrbc7qoaz7hcw.streamlit.app/)
+Demo (https://agents-for-developer-4husx9zyu35s9raom7wtig.streamlit.app/)
 
 ### Prerequisites
 1. Python 3.6 or above
@@ -45,6 +45,10 @@ echo OPENAI_API_KEY=your-api-key > .env
 OR
 
 Please replace your-api-key with your actual OpenAI API key.
+
+You will see exception if you don't have api key.
+
+ex. got exception. error: 1 validation error for ChatOpenAI root Did not find openai_api_key
 
 **6. Run the Streamlit application:**
 ```shell
