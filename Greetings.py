@@ -57,7 +57,7 @@ def run():
             - Automating Tasks: GPT can be used to automate routine tasks, 
             such as generating boilerplate code or setting up project structures.
 
-            (date : 2024-02-05.  rev 0.3)
+            (date : 2022-03-01.  rev 0.31)
 
     """
     )
