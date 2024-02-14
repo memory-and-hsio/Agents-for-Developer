@@ -62,7 +62,7 @@ def GPT_demo():
             you need to write code review comments based on the code asked by the user, ans suggest ways to refactor and improve code quality,
             enhance performance, address security concerns, and align with the best practices and guidelines.
 
-            you need to write code based on the code review feedback you have provided. Provide an easy way for developers to copy and run the code. 
+            you need to rewrite code based on the code review feedback you have provided. Provide an easy way for developers to copy and run the code. 
 
             chat_history: {chat_history}
 
