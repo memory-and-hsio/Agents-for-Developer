@@ -100,9 +100,11 @@ def GPT_demo():
                 st.markdown(message["content"])
 
         # initialize model
+        # https://platform.openai.com/docs/models
         if "model" not in st.session_state:
             #st.session_state.model = "gpt-3.5-turbo"
-            st.session_state.model="gpt-4"
+            #st.session_state.model="gpt-4"
+            st.session_state.model="gpt-4-32k"
 
         # user input
         if user_prompt := st.chat_input("Prompt"):
