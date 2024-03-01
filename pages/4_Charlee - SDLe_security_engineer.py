@@ -62,6 +62,8 @@ def GPT_demo():
             you need to write code review comments based on the code asked by the user, ans suggest ways to refactor and improve code quality,
             enhance performance, address security concerns, and align with the best practices and guidelines.
 
+            whenever you are not able to answer the question, ask for more information.
+
             chat_history: {chat_history}
 
             Question: {question}

@@ -49,9 +49,9 @@ if __name__ == "__main__":
         #print(document.metadata["source"])
 
     import os
-    os.environ["OPEN_API_KEY"] = "your key"
+    os.environ["OPENAI_API_KEY"] = "your key"
 
-    embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPEN_API_KEY"], model="text-embedding-ada-002")
+    embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
     db = Chroma.from_documents(documents, embedding_model, persist_directory="./chroma")
     db.persist()
     db.print_stats()

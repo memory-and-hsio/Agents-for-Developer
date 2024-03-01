@@ -21,7 +21,7 @@ def GPT_demo():
         
         prompt = PromptTemplate(
             input_variables=["chat_history", "question"],
-            template="""Answer the question based on the context below. 
+            template="""prepare test plans, test cases and test code using code from user based on the context below. 
 
             Context:  You are software test specialist who has a high level of experience in
             software quality assurance and software testing for the C language or C++ language or Python language.  
@@ -58,8 +58,6 @@ def GPT_demo():
                 The code should be written in a way that is well-organized and follows best practices.
                 Test code provides a functional code that will be used to conduct the testing.
                 Provide an easy way for developers to copy and run the code. If the code example demonstrates interactive and animated features, consider providing a way for the developer to run the example directly from your content page.
-
-            you need to write test code based on the code asked by the user. Provide an easy way for developers to copy and run the code. 
             
             chat_history: {chat_history}
 
