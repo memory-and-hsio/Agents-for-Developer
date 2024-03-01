@@ -18,15 +18,15 @@ from langchain_core.output_parsers import StrOutputParser
 load_dotenv()
 
 import os
-os.environ["OPEN_API_KEY"] = "your key"
+os.environ["OPENAI_API_KEY"] = "your key"
 
 #vectorstore
 vectorstore = Chroma(
     persist_directory="./chroma",
-    embedding_function=OpenAIEmbeddings(openai_api_key=os.environ["OPEN_API_KEY"], model="text-embedding-ada-002"),
+    embedding_function=OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002"),
 )
 
-llm = ChatOpenAI(openai_api_key=os.environ["OPEN_API_KEY"], temperature=0, model="gpt-4-0125-preview")
+llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], temperature=0, model="gpt-4-0125-preview")
 
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
