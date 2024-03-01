@@ -44,6 +44,8 @@ def GPT_demo():
 
             Write technical article on the topic asked by the user.
 
+            whenever you are not able to answer the question, ask for more information.
+
             chat_history: {chat_history}
 
             Question: {question}
