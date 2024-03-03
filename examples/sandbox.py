@@ -1,110 +1,86 @@
-import pygame
-import time
 import random
 
-pygame.init()
+# create a function to generate randomized name list
+def generate_name_list():
+    # create a list of names
+    names = ["John", "James", "Jack", "Jill", "Jane", "Jenny", "Jill", "Jude", "Jade", "Jasper", "Jasmine", "Jared", "Jen", "Jenifer", "Jeniffer"]
+    # shuffle the list
+    random.shuffle(names)
+    # return the list
+    return names
 
-white = (255, 255, 255)
-yellow = (255, 255, 102)
-black = (0, 0, 0)
-red = (213, 50, 80)
-green = (0, 255, 0)
-blue = (50, 153, 213)
 
-dis_width = 800
-dis_height = 600
-dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Snake Game')
+# create a function to generate randomized name list
+def generate_name_list():
+    # create a list of names
+    names = ["John", "James", "Jack", "Jill", "Jane", "Jenny", "Jill", "Jude", "Jade", "Jasper", "Jasmine", "Jared", "Jen", "Jenifer", "Jeniffer"]
+    # shuffle the list
+    random.shuffle(names)
+    # return the list
+    return names
 
-clock = pygame.time.Clock()
+# design a function to generate a list of random names
+def generate_name_list():
+    # create a list of names
+    names = ["John", "James", "Jack", "Jill", "Jane", "Jenny", "Jill", "Jude", "Jade", "Jasper", "Jasmine", "Jared", "Jen", "Jenifer", "Jeniffer"]
+    # shuffle the list
+    random.shuffle(names)
+    # return the list
+    return names
 
-snake_block = 10
-snake_speed = 15
+# design a function to sort name list in ascending order
+def sort_name_list(names):
+    # sort the list
+    names.sort()
+    # return the list
+    return names
 
-font_style = pygame.font.SysFont(None, 50)
+# create a function to do binary search on the list
+def binary_search_name_list(names, name):
+    # sort the list
+    names.sort()
+    # initialize the low and high
+    low = 0
+    high = len(names) - 1
+    # loop through the list
+    while low <= high:
+        # calculate the mid
+        mid = (low + high) // 2
+        # check if the name is found
+        if names[mid] == name:
+            # return the index
+            return mid
+        # check if the name is in the left half
+        elif names[mid] > name:
+            high = mid - 1
+        # check if the name is in the right half
+        else:
+            low = mid + 1
+    # return -1 if the name is not found
+    return -1
 
-def message(msg, color):
-    mesg = font_style.render(msg, True, color)
-    dis.blit(mesg, [dis_width / 6, dis_height / 3])
+# test function for binary_search_name_list
+def test_binary_search_name_list():
+    # create a list of names
+    names = ["John", "James", "Jack", "Jill", "Jane", "Jenny", "Jill", "Jude", "Jade", "Jasper", "Jasmine", "Jared", "Jen", "Jenifer", "Jeniffer"]
+    # sort the list
+    names.sort()
+    # test the function
+    assert binary_search_name_list(names, "John") == 7
+    assert binary_search_name_list(names, "James") == 6
+    assert binary_search_name_list(names, "Jack") == 5
+    assert binary_search_name_list(names, "Jill") == 4
+    assert binary_search_name_list(names, "Jane") == 3
+    assert binary_search_name_list(names, "Jenny") == 2
+    assert binary_search_name_list(names, "Jill") == 1
+    assert binary_search_name_list(names, "Jude") == 0
+    assert binary_search_name_list(names, "Jade") == 14
+    assert binary_search_name_list(names, "Jasper") == 13
+    assert binary_search_name_list(names, "Jasmine") == 12
+    assert binary_search_name_list(names, "Jared") == 11
+    assert binary_search_name_list(names, "Jen") == 10
+    assert binary_search_name_list(names, "Jenifer") == 9
+    assert binary_search_name_list(names, "Jeniffer") == 8
+    assert binary_search_name_list(names, "Jeniffer") == -1
 
-def gameLoop():
-    game_over = False
-    game_close = False
-
-    x1 = dis_width / 2
-    y1 = dis_height / 2
-
-    x1_change = 0
-    y1_change = 0
-
-    snake_List = []
-    Length_of_snake = 1
-
-    foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-    foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
-
-    while not game_over:
-
-        while game_close == True:
-            dis.fill(blue)
-            message("You Lost! Press C-Play Again or Q-Quit", red)
-            pygame.display.update()
-
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_q:
-                        game_over = True
-                        game_close = False
-                    if event.key == pygame.K_c:
-                        gameLoop()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_over = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    x1_change = -snake_block
-                    y1_change = 0
-                elif event.key == pygame.K_RIGHT:
-                    x1_change = snake_block
-                    y1_change = 0
-                elif event.key == pygame.K_UP:
-                    y1_change = -snake_block
-                    x1_change = 0
-                elif event.key == pygame.K_DOWN:
-                    y1_change = snake_block
-                    x1_change = 0
-
-        if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
-            game_close = True
-        x1 += x1_change
-        y1 += y1_change
-        dis.fill(blue)
-        pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
-        snake_Head = []
-        snake_Head.append(x1)
-        snake_Head.append(y1)
-        snake_List.append(snake_Head)
-        if len(snake_List) > Length_of_snake:
-            del snake_List[0]
-
-        for x in snake_List[:-1]:
-            if x == snake_Head:
-                game_close = True
-
-        for x in snake_List:
-            pygame.draw.rect(dis, black, [x[0], x[1], snake_block, snake_block])
-
-        pygame.display.update()
-
-        if x1 == foodx and y1 == foody:
-            foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
-            foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
-            Length_of_snake += 1
-
-        clock.tick(snake_speed)
-
-    pygame.quit()
-    quit()
-
-gameLoop()
+    
