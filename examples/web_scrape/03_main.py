@@ -9,7 +9,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
-from langchain.chains import create_qa_with_sources_chain
+from langchain.chains import create_qa_with_structure_chain
 from langchain.chains.llm import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
@@ -43,7 +43,7 @@ condense_question_chain = LLMChain(
     prompt=condense_question_prompt,
 )
 
-qa_chain = create_qa_with_sources_chain(llm)
+qa_chain = create_qa_with_structure_chain(llm)
 
 doc_prompt = PromptTemplate(
     template="Content: {page_content}\nSource: {source}",

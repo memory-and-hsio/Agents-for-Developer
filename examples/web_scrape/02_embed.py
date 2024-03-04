@@ -32,7 +32,7 @@ if __name__ == "__main__":
         silent_errors=True,
     )
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
+        chunk_size=1600,
         chunk_overlap=200,
     )
     data = loader.load()
