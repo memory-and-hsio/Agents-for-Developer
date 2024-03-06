@@ -1,5 +1,12 @@
 ## Template for creating your GPT with Streamlit and OpenAI API
 
+Purpose of this prj is to build AI driven domain expert agent for following area
+- Multimedia
+- Storage
+- Memory and HSIO
+- Embedded Controller software
+- Type C and PD
+- Hardware
 
 ### Demo App
 Demo (https://agents-for-developer-4husx9zyu35s9raom7wtig.streamlit.app/)
