@@ -16,6 +16,6 @@ matplotlib
 yfinance
 pandas
 numpy
-travily-python 
+tavily-python 
 langchainhub
 numexpr
