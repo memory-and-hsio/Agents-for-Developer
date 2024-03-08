@@ -60,8 +60,7 @@ if __name__ == "__main__":
     #load OPENAI API key
     load_dotenv()
     if os.path.exists(persist_directory):
-        print("already embedded articles. Please remove the directory first.")
-        exit(0)
+        print("already embedded articles. Please remove the directory first.  if not it's be appended")
 
     parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=20)
     child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
