@@ -1,5 +1,0 @@
-﻿id,title,status,target,progress,component,days_open,must_fix_for,impact,domain,customer_impact,customer_summary,priority
-16015202490,[OEM] intermittend gliches ,rejected,,,platform.Alder Lake.sw.firmware.Client BIOS#,0,,,,2-high,,p2-high
-16013072861,[OEM] design issues,rejected,,red,platform.Common.hw.pch.unknown,5,,*Impact: * (eg.. System Fails to boot/ fails to resume/xxx functionality is unreliable/..) *Recovery Mechanism : * (eg.. G3 / Reinitiate test/self-recoverable/..),power_management,2-high,,p2-high
-16012365553,[OEM] bugcheck during OOB,open,,,platform.Alder Lake.sw.firmware.IFWI#,7,beta,*Impact: * (eg.. System Fails to boot/ fails to resume/xxx functionality is unreliable/..) *Recovery Mechanism : * (eg.. G3 / Reinitiate test/self-recoverable/..),regulatory,2-high,,p2-high
-16012365588,[OEM] bugcheck during shutdown,open,,,platform.Alder Lake.sw.firmware.IFWI#,7,beta,*Impact: * (eg.. System Fails to boot/ fails to resume/xxx functionality is unreliable/..) *Recovery Mechanism : * (eg.. G3 / Reinitiate test/self-recoverable/..),regulatory,2-high,,p2-high
