@@ -170,7 +170,8 @@ if __name__ == "__main__":
     output_parser = StrOutputParser()
 
     #invoke question
-    ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
+    #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
+    ai_response = json.loads(retrieval_qa.invoke({"question": "Automated Workload Characterization for I/O Performanc"})["answer"])
     print(ai_response["answer"])
 
 
