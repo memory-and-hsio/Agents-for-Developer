@@ -6,3 +6,16 @@ python-dotenv
 langchain
 langchain-openai
 langchain-community
+tiktoken
+chromadb
+faiss-cpu
+pypdf
+markdown
+pyMuPDF
+matplotlib
+yfinance
+pandas
+numpy
+travily-python 
+langchainhub
+numexpr
