@@ -75,30 +75,32 @@ if __name__ == "__main__":
         documents = parent_splitter.split_documents(raw_documents)
         all_documents.extend(documents)
 
+    print(f"total {len(all_documents)} documents")
+
     # create embeddings for all the documents
     # https://python.langchain.com/docs/integrations/text_embedding/openai
     embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
-    vectorstore = Chroma(
-        persist_directory=persist_directory,
-        embedding_function=embedding_model,
-        collection_name=collection_name
-    )
-
-    # https://python.langchain.com/docs/modules/data_connection/retrievers/parent_document_retriever
-    local_store = LocalFileStore(local_store)
-    store = create_kv_docstore(local_store)
-    retriever = ParentDocumentRetriever(
-        vectorstore=vectorstore,
-        docstore=store,
-        child_splitter=child_splitter,
-        parent_splitter=parent_splitter,
-    )
 
     # add_documents returns error if all_documents is too large.
     # to workaround it, split list and add_documents in chunks
     # ValueError: Batch size 31875 exceeds maximum batch size 5461
-    split_doc_chunked = split_list(all_documents, 5000)
+    split_doc_chunked = split_list(all_documents, 1000)
     for split_doc in split_doc_chunked:
+        vectorstore = Chroma(
+            persist_directory=persist_directory,
+            embedding_function=embedding_model,
+            collection_name=collection_name
+        )
+
+        # https://python.langchain.com/docs/modules/data_connection/retrievers/parent_document_retriever
+        local_store_instance = LocalFileStore(local_store)
+        store_instance = create_kv_docstore(local_store_instance)
+        retriever = ParentDocumentRetriever(
+            vectorstore=vectorstore,
+            docstore=store_instance,
+            child_splitter=child_splitter,
+            parent_splitter=parent_splitter,
+        )
         retriever.add_documents(split_doc, ids=None)
         vectorstore.persist()
     #retriever.add_documents(all_documents, ids=None)
