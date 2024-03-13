@@ -9,6 +9,9 @@ from langchain.memory import ConversationBufferMemory
 from langchain_community.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import GPT4AllEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain.chains import create_qa_with_sources_chain
 from langchain.chains.llm import LLMChain
@@ -21,9 +24,10 @@ from langchain.storage._lc_store import create_kv_docstore
 from langchain.storage import LocalFileStore
 from langchain.retrievers import ParentDocumentRetriever
 from langchain.chains import RetrievalQA
+from langchain_community.llms import Ollama
+from langchain_community.chat_models import ChatOllama
 
 import chromadb
-
 import langchain
 #langchain.debug = True
 
@@ -75,12 +79,24 @@ if __name__ == "__main__":
     #load OPENAI API key
     load_dotenv()
     
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=20)
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
     # create embeddings for all the documents
     # https://python.langchain.com/docs/integrations/text_embedding/openai
-    embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
+    if os.getenv('USE_OLLAMA') == 'True':
+        print('Using OLLAMA embedding')    
+        #embedding_model = GPT4AllEmbeddings()
+        embedding_model = OllamaEmbeddings(model="llama2")
+    elif os.getenv('USE_OPENAI') == 'True':
+        print('Using OpenAI embedding') 
+        embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
+    elif os.getenv('USE_HUGGINGFACE') == 'True':
+        print('Using huggingface embedding')
+        embedding_model = HuggingFaceEmbeddings(model_name = "all-MiniLM-L6-v2")
+    else:
+        print("ERROR: please choose embedding model")
+
     vectorstore = Chroma(
         persist_directory=persist_directory,
         embedding_function=embedding_model,
@@ -106,7 +122,12 @@ if __name__ == "__main__":
 
     print("total", vectorstore._collection.count(), "in the collection")
 
-    llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-4-0125-preview")
+    if os.getenv('USE_OLLAMA') == 'True':
+        llm = ChatOllama(model="llama2")
+    elif os.getenv('USE_OPENAI') == 'True':
+        llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-4-0125-preview")
+    else:
+        print("ERROR: please choose LLM")
 
 
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -171,7 +192,7 @@ if __name__ == "__main__":
 
     #invoke question
     #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
-    ai_response = json.loads(retrieval_qa.invoke({"question": "Automated Workload Characterization for I/O Performanc"})["answer"])
+    ai_response = json.loads(retrieval_qa.invoke({"question": "NVMe Admin Queue Attributes "})["answer"])
     print(ai_response["answer"])
 
 
