@@ -5,14 +5,24 @@ import json
 
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import GPT4AllEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.document_loaders import (
     CSVLoader,
-    Docx2txtLoader,
     PyMuPDFLoader,
+    Docx2txtLoader,
     TextLoader,
     UnstructuredXMLLoader,
+    UnstructuredEmailLoader,
+    UnstructuredEPubLoader,
+    UnstructuredHTMLLoader,
     UnstructuredMarkdownLoader,
+    UnstructuredODTLoader,
+    UnstructuredPowerPointLoader,
+    UnstructuredWordDocumentLoader,
 )
+
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain.storage._lc_store import create_kv_docstore
@@ -22,6 +32,10 @@ from langchain.chains import RetrievalQA
 
 from dotenv import load_dotenv
 
+import langchain
+langchain.debug = True
+
+
 # TODO : you need to change following line to your local path
 # hsio : memory and high speed io
 # mm : multimedia
@@ -29,8 +43,8 @@ from dotenv import load_dotenv
 # typeC : typeC
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
-collection_name = "hsio"
-#collection_name = "temp"
+#collection_name = "hsio"
+collection_name = "temp"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
 local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
@@ -40,16 +54,22 @@ article_directory = os.path.abspath(DOC_ROOT + collection_name)
 document_loaders = {
     "txt": TextLoader,
     "pdf": PyMuPDFLoader,
-    "docx": Docx2txtLoader,
+    "docx": UnstructuredWordDocumentLoader,
+    "doc": UnstructuredWordDocumentLoader,
     "xml": UnstructuredXMLLoader,
     "md": UnstructuredMarkdownLoader,
-    "csv": CSVLoader
+    "csv": CSVLoader,
+    "ppt": UnstructuredPowerPointLoader,
+    "pptx": UnstructuredPowerPointLoader,
+    "html": UnstructuredHTMLLoader,
 }
+
 # define function to create DirectroyLoader for file type
 def create_directory_loader(file_type, path):
     loader_cls = document_loaders.get(file_type)
     if loader_cls is None:
         raise ValueError(f"Unsupported file type: {file_type}")
+    #return DirectoryLoader(path, glob=f"**/*.{file_type}", loader_cls=loader_cls, show_progress=True)
     return DirectoryLoader(path, glob=f"*.{file_type}", loader_cls=loader_cls, show_progress=True)
 
 def split_list(input_list, chunk_size):
@@ -61,10 +81,11 @@ if __name__ == "__main__":
     #load OPENAI API key
     load_dotenv()
     if os.path.exists(persist_directory):
-        print("already embedded articles. Please remove the directory first.  if not it's be appended")
+        print(persist_directory)
+        print("already embedded articles. Please remove the directory first.  if not it'll be appended")
 
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=20)
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
     all_documents = []
 
@@ -79,7 +100,18 @@ if __name__ == "__main__":
 
     # create embeddings for all the documents
     # https://python.langchain.com/docs/integrations/text_embedding/openai
-    embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
+    if os.getenv('USE_OLLAMA') == 'True':
+        print('Using OLLAMA embedding')    
+        #embedding_model = GPT4AllEmbeddings()
+        embedding_model = OllamaEmbeddings(base_url=f'http://localhost:11434', model="llama2", show_progress=True)
+    elif os.getenv('USE_OPENAI') == 'True':
+        print('Using OpenAI embedding') 
+        embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
+    elif os.getenv('USE_HUGGINGFACE') == 'True':
+        print('Using huggingface embedding')
+        embedding_model = HuggingFaceEmbeddings(model_name = "all-MiniLM-L6-v2")
+    else:
+        print("ERROR: please choose embedding model")
 
     # add_documents returns error if all_documents is too large.
     # to workaround it, split list and add_documents in chunks
@@ -105,6 +137,8 @@ if __name__ == "__main__":
         vectorstore.persist()
     #retriever.add_documents(all_documents, ids=None)
     
+    vectorstore = None
+
     print("chroma db created")
 
     exit(0)

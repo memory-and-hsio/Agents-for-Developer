@@ -19,3 +19,7 @@ numpy
 tavily-python 
 langchainhub
 numexpr
+llama-cpp-python
+gpt4all
+urllib3
+unstructured
