@@ -63,7 +63,8 @@ vectorstore,search_type="similarity",k=4,score_threshold=None
 # typeC : typeC
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
-collection_name = "hsio"
+collection_name = "temp"
+#collection_name = "hsio"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
 local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     if os.getenv('USE_OLLAMA') == 'True':
         print('Using OLLAMA embedding')    
         #embedding_model = GPT4AllEmbeddings()
-        embedding_model = OllamaEmbeddings(model="llama2")
+        embedding_model = OllamaEmbeddings(base_url=f'http://localhost:11434', model="llama2", show_progress=True)
     elif os.getenv('USE_OPENAI') == 'True':
         print('Using OpenAI embedding') 
         embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
@@ -179,23 +180,21 @@ if __name__ == "__main__":
         combine_documents_chain=final_qa_chain,
     )
 
-    # ConversationalRetrievalChain is a chain that combines the question generator, retriever, memory, and combine_docs_chain
-    retrieval_qa = ConversationalRetrievalChain(
-        question_generator=condense_question_chain,
-        retriever=retriever,
-        memory=memory,
-        combine_docs_chain=reduce_documents_chain,
-        #combine_docs_chain=final_qa_chain,
-    )
 
-    output_parser = StrOutputParser()
+    if os.getenv('USE_OLLAMA') == 'True':
+        retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever)
+        ai_response = retrieval_qa.invoke({"query": "what is ramda AI"})
+    elif os.getenv('USE_OPENAI') == 'True':
+        # ConversationalRetrievalChain is a chain that combines the question generator, retriever, memory, and combine_docs_chain
+        retrieval_qa = ConversationalRetrievalChain(
+            question_generator=condense_question_chain,
+            retriever=retriever,
+            memory=memory,
+            combine_docs_chain=reduce_documents_chain,
+            #combine_docs_chain=final_qa_chain,
+        )
+        #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
+        ai_response = json.loads(retrieval_qa.invoke({"question": "what is ramda AI"})["answer"])
 
-    #invoke question
-    #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
-    ai_response = json.loads(retrieval_qa.invoke({"question": "NVMe Admin Queue Attributes "})["answer"])
-    print(ai_response["answer"])
-
-
-    #from pprint import pprint
-    #pprint(output_parser.parse(out))
+    print(ai_response)
 
