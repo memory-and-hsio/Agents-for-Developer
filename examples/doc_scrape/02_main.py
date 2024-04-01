@@ -87,7 +87,7 @@ if __name__ == "__main__":
     if os.getenv('USE_OLLAMA') == 'True':
         print('Using OLLAMA embedding')    
         #embedding_model = GPT4AllEmbeddings()
-        embedding_model = OllamaEmbeddings(model="llama2")
+        embedding_model = OllamaEmbeddings(base_url=f'http://localhost:11434', model="llama2", show_progress=True)
     elif os.getenv('USE_OPENAI') == 'True':
         print('Using OpenAI embedding') 
         embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
