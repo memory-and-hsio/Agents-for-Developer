@@ -7,14 +7,12 @@ from dotenv import load_dotenv
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain_community.vectorstores import Chroma
+from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
-from langchain_community.embeddings import GPT4AllEmbeddings
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.chains import create_qa_with_sources_chain
 from langchain.chains.llm import LLMChain
+from langchain.chains import LLMMathChain
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
@@ -24,12 +22,31 @@ from langchain.storage._lc_store import create_kv_docstore
 from langchain.storage import LocalFileStore
 from langchain.retrievers import ParentDocumentRetriever
 from langchain.chains import RetrievalQA
-from langchain_community.llms import Ollama
-from langchain_community.chat_models import ChatOllama
+from langchain.tools.retriever import create_retriever_tool
+from langchain.agents import AgentExecutor, create_openai_functions_agent, Tool, create_react_agent, AgentOutputParser
+from langchain import hub
 
 import chromadb
+
 import langchain
 #langchain.debug = True
+
+
+
+# TODO : you need to change following line to your local path
+# hsio : memory and high speed io
+# mm : multimedia
+# ec : ec
+# typeC : typeC
+DOC_ROOT = f"..\\..\\article\\"
+VS_ROOT = f"..\\..\\persistent\\"
+collection_name = "hsio"
+
+
+persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
+local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
+article_directory = os.path.abspath(DOC_ROOT + collection_name)
+
 
 def Vectorstore_backed_retriever(
 vectorstore,search_type="similarity",k=4,score_threshold=None
@@ -56,19 +73,6 @@ vectorstore,search_type="similarity",k=4,score_threshold=None
 
 
 
-# TODO : you need to change following line to your local path
-# hsio : memory and high speed io
-# mm : multimedia
-# ec : ec
-# typeC : typeC
-DOC_ROOT = f"..\\..\\article\\"
-VS_ROOT = f"..\\..\\persistent\\"
-collection_name = "temp"
-#collection_name = "hsio"
-
-persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
-local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
-article_directory = os.path.abspath(DOC_ROOT + collection_name)
 
 
 if __name__ == "__main__":
@@ -80,24 +84,12 @@ if __name__ == "__main__":
     #load OPENAI API key
     load_dotenv()
     
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=20)
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
 
     # create embeddings for all the documents
     # https://python.langchain.com/docs/integrations/text_embedding/openai
-    if os.getenv('USE_OLLAMA') == 'True':
-        print('Using OLLAMA embedding')    
-        #embedding_model = GPT4AllEmbeddings()
-        embedding_model = OllamaEmbeddings(base_url=f'http://localhost:11434', model="llama2", show_progress=True)
-    elif os.getenv('USE_OPENAI') == 'True':
-        print('Using OpenAI embedding') 
-        embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
-    elif os.getenv('USE_HUGGINGFACE') == 'True':
-        print('Using huggingface embedding')
-        embedding_model = HuggingFaceEmbeddings(model_name = "all-MiniLM-L6-v2")
-    else:
-        print("ERROR: please choose embedding model")
-
+    embedding_model = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"], model="text-embedding-ada-002")
     vectorstore = Chroma(
         persist_directory=persist_directory,
         embedding_function=embedding_model,
@@ -123,12 +115,7 @@ if __name__ == "__main__":
 
     print("total", vectorstore._collection.count(), "in the collection")
 
-    if os.getenv('USE_OLLAMA') == 'True':
-        llm = ChatOllama(model="llama2")
-    elif os.getenv('USE_OPENAI') == 'True':
-        llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-4-0125-preview")
-    else:
-        print("ERROR: please choose LLM")
+    llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-4-0125-preview")
 
 
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -180,21 +167,78 @@ if __name__ == "__main__":
         combine_documents_chain=final_qa_chain,
     )
 
+    # ConversationalRetrievalChain is a chain that combines the question generator, retriever, memory, and combine_docs_chain
+    retrieval_qa = ConversationalRetrievalChain(
+        question_generator=condense_question_chain,
+        retriever=retriever,
+        memory=memory,
+        combine_docs_chain=reduce_documents_chain,
+        #combine_docs_chain=final_qa_chain,
+    )
 
-    if os.getenv('USE_OLLAMA') == 'True':
-        retrieval_qa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever)
-        ai_response = retrieval_qa.invoke({"query": "what is ramda AI"})
-    elif os.getenv('USE_OPENAI') == 'True':
-        # ConversationalRetrievalChain is a chain that combines the question generator, retriever, memory, and combine_docs_chain
-        retrieval_qa = ConversationalRetrievalChain(
-            question_generator=condense_question_chain,
-            retriever=retriever,
-            memory=memory,
-            combine_docs_chain=reduce_documents_chain,
-            #combine_docs_chain=final_qa_chain,
-        )
-        #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
-        ai_response = json.loads(retrieval_qa.invoke({"question": "what is ramda AI"})["answer"])
+    output_parser = StrOutputParser()
+
+    # initialize the LLM tool
+    retrieval_tool = Tool(
+        name='PCIe, CXL, NVMe and High speed I/O Expert',
+        func=retrieval_qa.invoke,
+        #func=final_qa_chain.invoke,
+        description='Use this tool for PCIe, CXL, NVMe and High speed I/O related queries'
+    )
+
+
+    llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=False)
+
+    calculator_tool = Tool(
+        name="Calculator",
+        func=llm_math_chain.run,
+        description="A tool that uses the LLM to perform math calculations. Input should be a math question."
+    )
+
+    tavily_tool = TavilySearchResults()
+    
+    tools = [retrieval_tool, tavily_tool, calculator_tool]
+
+    instructions = """You are an assistant.
+    Please answer in a structured, clear, coherent, and comprehensive manner.
+    If the content has sections, please summarize them in order and present them easy to read format.
+    if you are using table or figure number then make sure to add reference at the footnote.
+    please mention reference sources.
+    Please make sure to provide the answer in a structured, clear, coherent, and comprehensive manner.
+    """
+
+    react_base_prompt = hub.pull("hwchase17/react")
+    react_prompt = react_base_prompt.partial(instructions=instructions)
+
+    agent_executor = AgentExecutor(
+        agent=create_react_agent(llm, tools, react_prompt), 
+        tools=tools, 
+        verbose=True,
+        max_iterations = 10,
+        memory=memory
+    )
+
+    #ai_response = agent_executor.invoke({"input": "total population of america plus population of south korea"})['output']
+    ai_response = agent_executor.invoke({"input": "how does MPS impact PCIe packet efficiency "})['output']
 
     print(ai_response)
+
+
+    # Define prompt
+    last_prompt_template = """You are an assistant. please rewrite content in a structured, clear, coherent, and comprehensive manner.
+    If the content has sections, please summarize them in order and present them easy to read format.
+    If the content has program code, please provide an easy way for developers to copy and run the code.
+    If the content has table or figure number then make sure to add reference at the footnote.
+    please mention reference sources.
+    
+    Content: {page_content}
+    """
+    last_prompt = PromptTemplate.from_template(last_prompt_template)
+
+    # Define LLM chain
+    last_llm_chain = LLMChain(llm=llm, prompt=last_prompt)
+
+    ai_response = last_llm_chain.predict(page_content=ai_response)
+    print(ai_response)
+
 
