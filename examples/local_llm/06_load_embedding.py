@@ -185,7 +185,7 @@ try:
         for i in range(0, len(input_list), chunk_size):
             yield input_list[i:i + chunk_size]
 
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=100)
     child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
     all_documents = []

@@ -1,13 +1,17 @@
-DEFAULT_SYSTEM_PROMPT = """\
-You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.
-If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\
+DEFAULT_SYSTEM_PROMPT = """You are an assistant for question-answering task. 
+    If the content has sections, please summarize them in order and present them easy to read format.
+    if you are using table or figure number then make sure to add reference at the footnote.
+    please mention reference sources.
+    Please make sure to provide the answer in a structured, clear, coherent, and comprehensive manner.
 """
 
-
-DEFAULT_RAG_PROMPT = """\
-You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.\
+DEFAULT_RAG_PROMPT = """You are an assistant for question-answering task. 
+    Use the retrieved context to answer the question.
+    If the content has sections, please summarize them in order and present them easy to read format.
+    if you are using table or figure number then make sure to add reference at the footnote.
+    please mention reference sources.
+    Please make sure to provide the answer in a structured, clear, coherent, and comprehensive manner.
 """
-
 
 def red_pijama_partial_text_processor(partial_text, new_text):
     if new_text == "<":

@@ -169,7 +169,11 @@ try:
         model_dir = fp16_model_dir
     print(f"Loading model from {model_dir}")
 
-    ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": ""}
+    model_cache_dir = os.path.join(model_dir, "cache")
+
+
+    #ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": ""}
+    ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": model_cache_dir}
 
     core = ov.Core()
 
@@ -220,7 +224,7 @@ except Exception as e:
 
 
 def Vectorstore_backed_retriever(
-vectorstore,search_type="similarity",k=8,score_threshold=None
+vectorstore,search_type="similarity",k=4,score_threshold=None
 ):
     """create a vectorsore-backed retriever
     ref. https://medium.com/thedeephub/rag-chatbot-powered-by-langchain-openai-google-generative-ai-and-hugging-face-apis-6a9b9d7d59db
@@ -249,7 +253,7 @@ try:
         print("embedded not found. Please run 06_load_embedding.py first.")
         exit(0)
 
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=100)
     child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
     # create embeddings for all the documents
@@ -272,7 +276,7 @@ try:
         child_splitter=child_splitter,
         parent_splitter=parent_splitter,
         search_type="mmr",
-        k=8,
+        k=10,
     )
 
     #retriever = Vectorstore_backed_retriever(vectorstore, search_type="similarity",k=8)
@@ -311,7 +315,7 @@ try:
     generate_kwargs = dict(
         model=ov_model,
         tokenizer=tok,
-        max_new_tokens=256,
+        max_new_tokens=512,
         temperature=temperature,
         do_sample=temperature > 0.0,
         top_p=top_p,
@@ -324,6 +328,8 @@ try:
     pipe = pipeline("text-generation", **generate_kwargs)
     llm = HuggingFacePipeline(pipeline=pipe)
 
+    #llm = ChatOllama(model="llama2")
+    #llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-4-0125-preview")
 
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
@@ -374,6 +380,7 @@ try:
         combine_documents_chain=final_qa_chain,
     )
 
+    
     retrieval_prompt = PromptTemplate.from_template(llm_model_configuration["rag_prompt_template"])
     
     chain_type_kwargs = {"prompt": retrieval_prompt}
@@ -384,7 +391,20 @@ try:
         retriever=retriever,
         chain_type_kwargs=chain_type_kwargs,
     )
-    ai_response = retrieval_qa.invoke({"query": "what are the Sanitize Command Restrictions"})
+    ai_response = retrieval_qa.invoke({"query": "explain theory of NVMe operation"})
+    
+
+    """ 
+    retrieval_qa = ConversationalRetrievalChain(
+        question_generator=condense_question_chain,
+        retriever=retriever,
+        memory=memory,
+        combine_docs_chain=reduce_documents_chain,
+        #combine_docs_chain=final_qa_chai1n,
+    )
+    #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
+    ai_response = json.loads(retrieval_qa.invoke({"question": "what are the Sanitize Command Restrictions"})["answer"])
+    """
 
     print(ai_response)
 
