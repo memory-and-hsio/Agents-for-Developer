@@ -94,6 +94,7 @@ def GPT_demo(retriever, ov_llm):
 
     try:
         
+        """
         # initialize model
         # https://platform.openai.com/docs/models
         if "model" not in st.session_state:
@@ -103,7 +104,8 @@ def GPT_demo(retriever, ov_llm):
             st.session_state.model="gpt-4-turbo-preview"
 
 
-        #llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model=st.session_state.model)
+        llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model=st.session_state.model)
+        """
         llm = ov_llm
 
 

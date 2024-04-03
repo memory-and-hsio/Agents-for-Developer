@@ -127,6 +127,21 @@ SUPPORTED_LLM_MODELS = {
             Context: {context} 
             Answer: [/INST]""",
         },
+        "mistral-8x7b": {
+            # https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
+            "model_id": "mistralfai/Mixtral-8x7B-Instruct-v0.1",
+            "remote": False,
+            "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
+            "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
+            "current_message_template": "{user} [/INST]{assistant}",
+            "tokenizer_kwargs": {"add_special_tokens": False},
+            "partial_text_processor": llama_partial_text_processor,
+            "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
+            + """ 
+            [INST] Question: {question} 
+            Context: {context} 
+            Answer: [/INST]""",
+        },
         "zephyr-7b-beta": {
             # https://huggingface.co/HuggingFaceH4/zephyr-7b-beta
             "model_id": "HuggingFaceH4/zephyr-7b-beta",
