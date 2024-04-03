@@ -43,8 +43,8 @@ langchain.debug = True
 # typeC : typeC
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
-#collection_name = "hsio"
-collection_name = "temp"
+collection_name = "hsio"
+#collection_name = "temp"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
 local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")

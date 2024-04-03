@@ -155,7 +155,7 @@ opentelemetry-util-http==0.44b0
 openvino==2024.0.0
 openvino-nightly==2024.1.0.dev20240328
 openvino-telemetry==2023.2.1
-openvino-tensorflow==2.3.0
+#openvino-tensorflow==2.3.0
 optimum==1.18.0
 optimum-intel @ git+https://github.com/huggingface/optimum-intel.git@447ef502b7f4fd089d43c24de42394d9ac8aac1d
 orjson==3.9.15

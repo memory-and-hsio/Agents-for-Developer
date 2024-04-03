@@ -48,7 +48,7 @@ from transformers import (
     StoppingCriteriaList,
 )
 
-langchain.debug = True
+#langchain.debug = True
 
 import dotenv
 
@@ -77,7 +77,7 @@ print(f"Selected LLM device {os.getenv('LLM_DEVICE_ID')}")
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
 MODEL_ROOT = f"..\\..\\model\\"
-collection_name = "temp"
+collection_name = "platform"
 #collection_name = "hsio"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")

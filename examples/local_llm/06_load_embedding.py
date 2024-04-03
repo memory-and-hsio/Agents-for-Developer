@@ -142,8 +142,12 @@ DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
 MODEL_ROOT = f"..\\..\\model\\"
 
+#DOC_ROOT = f"C:\\workspace\\llm\\Agents-for-Developer\\article\\"
+#VS_ROOT = f"C:\\workspace\\llm\\Agents-for-Developer\\persistent\\"
+#MODEL_ROOT = f"C:\\workspace\\llm\\Agents-for-Developer\\model\\"
+
 #collection_name = "hsio"
-collection_name = "temp"
+collection_name = "platform"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
 local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
@@ -158,11 +162,17 @@ document_loaders = {
     "doc": UnstructuredWordDocumentLoader,
     "xml": UnstructuredXMLLoader,
     "md": UnstructuredMarkdownLoader,
+    "mmd": UnstructuredMarkdownLoader,
     "csv": CSVLoader,
     "ppt": UnstructuredPowerPointLoader,
     "pptx": UnstructuredPowerPointLoader,
     "html": UnstructuredHTMLLoader,
 }
+
+document_loaders = {
+    "html": UnstructuredHTMLLoader,
+}
+
 
 
 langchain.debug = True
@@ -227,11 +237,13 @@ try:
         # get medatada from the document and check if it's already embedded
         metadata = split_doc[0].metadata
         print(metadata["source"])
+        """
         print(metadata["page"])
         # check source and page from vectorstore
         results = vectorstore.get( where={"$and": [{"source": metadata["source"]}, {"page": metadata["page"]}]}, include=["metadatas"],)
         if len(results["ids"]) > 0:
             print(f"Already embedded {metadata}")
+        """
 
         retriever.add_documents(split_doc, ids=None)
         vectorstore.persist()

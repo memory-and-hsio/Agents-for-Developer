@@ -63,8 +63,8 @@ vectorstore,search_type="similarity",k=4,score_threshold=None
 # typeC : typeC
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
+collection_name = "hsio"
 collection_name = "temp"
-#collection_name = "hsio"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
 local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
@@ -193,8 +193,8 @@ if __name__ == "__main__":
             combine_docs_chain=reduce_documents_chain,
             #combine_docs_chain=final_qa_chain,
         )
-        #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
-        ai_response = json.loads(retrieval_qa.invoke({"question": "what is ramda AI"})["answer"])
+        ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
+        #ai_response = json.loads(retrieval_qa.invoke({"question": "what is ramda AI"})["answer"])
 
     print(ai_response)
 
