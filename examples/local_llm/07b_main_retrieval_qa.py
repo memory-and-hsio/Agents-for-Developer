@@ -48,6 +48,8 @@ from transformers import (
     StoppingCriteriaList,
 )
 
+langchain.debug = True
+
 import dotenv
 
 try:
@@ -171,53 +173,26 @@ try:
 
     model_cache_dir = os.path.join(model_dir, "cache")
 
+    from optimum.intel.openvino import OVModelForCausalLM
+    from transformers import AutoTokenizer, pipeline
+    from transformers import AutoTokenizer, AutoModelForCausalLM
 
     #ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": ""}
-    ov_config = {"PERFORMANCE_HINT": "LATENCY", "NUM_STREAMS": "1", "CACHE_DIR": model_cache_dir}
+    ov_config = {
+        "PERFORMANCE_HINT": "LATENCY", 
+        "NUM_STREAMS": "1", 
+        "CACHE_DIR": "",
+    }
 
-    core = ov.Core()
-
-    # On a GPU device a model is executed in FP16 precision. For red-pajama-3b-chat model there known accuracy
-    # issues caused by this, which we avoid by setting precision hint to "f32".
-    if llm_model_id == "red-pajama-3b-chat" and "GPU" in core.available_devices and llm_device_id in ["GPU", "AUTO"]:
-        ov_config["INFERENCE_PRECISION_HINT"] = "f32"
-
-    model_name = llm_model_configuration["model_id"]
-    stop_tokens = llm_model_configuration.get("stop_tokens")
-    class_key = llm_model_id.split("-")[0]
-    tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-
-    class StopOnTokens(StoppingCriteria):
-        def __init__(self, token_ids):
-            self.token_ids = token_ids
-
-        def __call__(
-            self, input_ids: torch.LongTensor, scores: torch.FloatTensor, **kwargs
-        ) -> bool:
-            for stop_id in self.token_ids:
-                if input_ids[0][-1] == stop_id:
-                    return True
-            return False
-
-    if stop_tokens is not None:
-        if isinstance(stop_tokens[0], str):
-            stop_tokens = tok.convert_tokens_to_ids(stop_tokens)
-
-        stop_tokens = [StopOnTokens(stop_tokens)]
-
-    model_class = (
-        OVModelForCausalLM
-        if not llm_model_configuration["remote"]
-        else model_classes[class_key]
-    )
-    ov_model = model_class.from_pretrained(
-        model_dir,
-        device=llm_device_id,
-        ov_config=ov_config,
-        config=AutoConfig.from_pretrained(model_dir, trust_remote_code=True),
-        trust_remote_code=True,
+    ov_llm = HuggingFacePipeline.from_model_id(
+        model_id=Path(model_dir).absolute().as_posix(),
+        task="text-generation",
+        backend="openvino",
+        model_kwargs={"device": llm_device_id, "ov_config": ov_config},
+        pipeline_kwargs={"max_new_tokens": 1000},
     )
 
+    
 except Exception as e:
     print(e)
     exit(0)
@@ -253,8 +228,8 @@ try:
         print("embedded not found. Please run 06_load_embedding.py first.")
         exit(0)
 
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=100)
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=10)
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=10)
 
     # create embeddings for all the documents
     #embedding_model = embedding
@@ -275,8 +250,9 @@ try:
         docstore=store,
         child_splitter=child_splitter,
         parent_splitter=parent_splitter,
-        search_type="mmr",
-        k=10,
+        #search_type="mmr",
+        search_type="similarity",
+        k=1,
     )
 
     #retriever = Vectorstore_backed_retriever(vectorstore, search_type="similarity",k=8)
@@ -307,7 +283,8 @@ try:
       repetition_penalty: parameter for penalizing tokens based on how frequently they occur in the text.
       conversation_id: unique conversation identifier.
     """
-    temperature = 0.1  # 0.0 means deterministic, 1.0 means maximum diversity
+    """
+    temperature = 0.0  # 0.0 means deterministic, 1.0 means maximum diversity
     top_p = 0.9  # 0.0 means no restrictions, 1.0 means only one token is considered
     top_k = 50  # 0 means no restrictions, 200 maximum
     repetition_penalty = 1.1  # 1.0 means no penalty, 2.0 means tokens are halved in probability
@@ -315,11 +292,11 @@ try:
     generate_kwargs = dict(
         model=ov_model,
         tokenizer=tok,
-        max_new_tokens=512,
+        max_new_tokens=1024,
         temperature=temperature,
         do_sample=temperature > 0.0,
-        top_p=top_p,
-        top_k=top_k,
+        #top_p=top_p,
+        #top_k=top_k,
         repetition_penalty=repetition_penalty,
     )
     if stop_tokens is not None:
@@ -327,25 +304,11 @@ try:
 
     pipe = pipeline("text-generation", **generate_kwargs)
     llm = HuggingFacePipeline(pipeline=pipe)
-
+    """    
+    llm = ov_llm
     #llm = ChatOllama(model="llama2")
     #llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model="gpt-4-0125-preview")
 
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-
-    condense_question_prompt = """Given the following conversation and a follow up question, \
-        rephrase the follow up question to be a standalone question, in its original language.\
-        Make sure to avoid using any unclear pronouns.
-
-        Chat History:
-        {chat_history}
-        Follow Up Input: {question}
-        Standalone question:"""
-    condense_question_prompt = PromptTemplate.from_template(condense_question_prompt)
-    condense_question_chain = LLMChain(
-        llm=llm,
-        prompt=condense_question_prompt,
-    )
 
     # Create a question answering chain that returns an answer with sources.
     qa_chain = create_qa_with_sources_chain(llm)
@@ -361,53 +324,50 @@ try:
         input_variables=["page_content"],
     )
 
-
-    # create final_qa_chain with map reduce chain
-    
-    # StuffDocumentsChain is a chain that takes a list of documents and first combines them into a single string. 
-    # It does this by formatting each document into a string with the document_prompt and then joining them together with document_separator. 
-    # It then adds that new string to the inputs with the variable name set by document_variable_name. Those inputs are then passed to the llm_chain.
-    final_qa_chain = StuffDocumentsChain(
-        llm_chain=qa_chain,
-        document_variable_name="context",
-        document_prompt=doc_prompt,
-    )
-
-    # This chain combines documents by iterative reducing them. 
-    # It groups documents into chunks (less than some context length) then passes them into an LLM. 
-    # It then takes the responses and continues to do this until it can fit everything into one final LLM call.
-    reduce_documents_chain = ReduceDocumentsChain(
-        combine_documents_chain=final_qa_chain,
-    )
-
     
     retrieval_prompt = PromptTemplate.from_template(llm_model_configuration["rag_prompt_template"])
-    
-    chain_type_kwargs = {"prompt": retrieval_prompt}
     
     retrieval_qa = RetrievalQA.from_chain_type(
         llm=llm, 
         chain_type="stuff", 
         retriever=retriever,
-        chain_type_kwargs=chain_type_kwargs,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": retrieval_prompt},
     )
     ai_response = retrieval_qa.invoke({"query": "explain theory of NVMe operation"})
+    print(ai_response)
     
+    
+    """
+    from langchain import hub
+    from langchain_core.runnables import RunnablePassthrough, RunnablePick
 
-    """ 
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+    rag_prompt = hub.pull("rlm/rag-prompt")
+
+    qa_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | rag_prompt
+        | llm
+        | StrOutputParser()
+    )
+    qa_chain.invoke("what are the Sanitize Command Restrictions")
+    """
+
+    """
     retrieval_qa = ConversationalRetrievalChain(
         question_generator=condense_question_chain,
         retriever=retriever,
         memory=memory,
-        combine_docs_chain=reduce_documents_chain,
-        #combine_docs_chain=final_qa_chai1n,
+        #combine_docs_chain=reduce_documents_chain,
+        combine_docs_chain=final_qa_chain,
     )
     #ai_response = json.loads(retrieval_qa.invoke({"question": "PCIe packet efficiency based on the MPS size"})["answer"])
-    ai_response = json.loads(retrieval_qa.invoke({"question": "what are the Sanitize Command Restrictions"})["answer"])
-    """
-
+    ai_response = json.loads(retrieval_qa.invoke({"question": "explain theory of NVMe operation"})["answer"])
+    
     print(ai_response)
-
+    """
 
 except Exception as e:
     print(e)

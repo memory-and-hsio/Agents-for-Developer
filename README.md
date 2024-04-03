@@ -49,6 +49,7 @@ pip install -r requirements.txt
 ```shell
 echo OPENAI_API_KEY=your-openai api-key > .env
 echo TAVILY_API_KEY=your-tavily api-key > .env
+echo HUGGINGFACEHUB_API_TOKEN=your-huggingface token > .env
 ```
 OR
 

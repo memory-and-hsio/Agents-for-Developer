@@ -42,6 +42,7 @@ from config import SUPPORTED_EMBEDDING_MODELS, SUPPORTED_LLM_MODELS
 from pprint import pprint
 
 llm_model_id = os.getenv('LLM_MODEL_ID')
+model_to_compress = os.getenv('LLM_MODEL_COMPRESSION')
 
 llm_model_configuration = SUPPORTED_LLM_MODELS['English'][llm_model_id]
 pprint(llm_model_configuration)
@@ -80,9 +81,43 @@ try:
     fp16_model_dir = Path(model_directory + '\\' + llm_model_id + '\\' + "FP16")
     int8_model_dir = Path(model_directory + '\\' + llm_model_id + '\\' + "INT8_compressed_weights")
     int4_model_dir = Path(model_directory + '\\' + llm_model_id + '\\' + "INT4_compressed_weights")
+    if model_to_compress == "INT4-model":
+        model_dir = int4_model_dir
+        weight_format = "int4"
+    elif model_to_compress == "INT8-model":
+        model_dir = int8_model_dir
+        weight_format = "int8"
+    else:
+        model_dir = fp16_model_dir
+        weight_format = "fp16"
+    print(f"model dir  {model_dir}")
+
 except Exception as e:
     print(e)
     exit(0)
+
+# optimum-cli export openvino --model "meta-llama/Llama-2-7b-chat-hf" ov_model_dir_llama
+    
+try:
+    #call 'optimum-cli' command to export the model to OpenVINO format
+    import subprocess
+    subprocess.call([
+            'optimum-cli.exe', 
+            'export', 
+            'openvino',
+            '--model',
+            pt_model_id,
+            '--weight-format',
+            weight_format,
+            model_dir
+    ])
+
+ 
+except Exception as e:
+    print(e)
+    exit(0)
+
+exit(0)
 
 try:
     def convert_to_fp16():
