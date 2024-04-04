@@ -129,7 +129,7 @@ SUPPORTED_LLM_MODELS = {
         },
         "mistral-8x7b": {
             # https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
-            "model_id": "mistralfai/Mixtral-8x7B-Instruct-v0.1",
+            "model_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
             "remote": False,
             "start_message": f"<s>[INST] <<SYS>>\n{DEFAULT_SYSTEM_PROMPT }\n<</SYS>>\n\n",
             "history_template": "{user}[/INST]{assistant}</s><s>[INST]",

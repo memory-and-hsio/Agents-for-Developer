@@ -94,18 +94,6 @@ def GPT_demo(retriever, ov_llm):
 
     try:
         
-        """
-        # initialize model
-        # https://platform.openai.com/docs/models
-        if "model" not in st.session_state:
-            #st.session_state.model = "gpt-3.5-turbo"
-            #st.session_state.model="gpt-4"
-            #st.session_state.model="gpt-4-32k"
-            st.session_state.model="gpt-4-turbo-preview"
-
-
-        llm = ChatOpenAI(openai_api_key=os.environ["OPENAI_API_KEY"], model=st.session_state.model)
-        """
         llm = ov_llm
 
 
@@ -240,13 +228,23 @@ try:
         Please make sure to provide the answer in a structured, clear, coherent, and comprehensive manner.
     """
 
-    def llama_partial_text_processor(partial_text, new_text):
-        new_text = new_text.replace("[INST]", "").replace("[/INST]", "")
-        partial_text += new_text
-        return partial_text
-
     SUPPORTED_LLM_MODELS = {
         "English":{
+            "tiny-llama-1b-chat": {
+                # https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0
+                "model_id": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+                "remote": False,
+                "start_message": f"<|system|>\n{DEFAULT_SYSTEM_PROMPT}</s>\n",
+                "history_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}</s> \n",
+                "current_message_template": "<|user|>\n{user}</s> \n<|assistant|>\n{assistant}",
+                "rag_prompt_template": f"""<|system|> {DEFAULT_RAG_PROMPT }</s>"""
+                + """
+                <|user|>
+                Question: {question} 
+                Context: {context} 
+                Answer: </s>
+                <|assistant|>""",
+            },
             "llama-2-chat-7b": {
                 # https://huggingface.co/meta-llama/Llama-2-7b-chat-hf
                 "model_id": "meta-llama/Llama-2-7b-chat-hf",
@@ -255,7 +253,6 @@ try:
                 "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
                 "current_message_template": "{user} [/INST]{assistant}",
                 "tokenizer_kwargs": {"add_special_tokens": False},
-                "partial_text_processor": llama_partial_text_processor,
                 "rag_prompt_template": f"""[INST]Human: <<SYS>> {DEFAULT_RAG_PROMPT }<</SYS>>"""
                 + """
                 Question: {question} 
@@ -270,12 +267,25 @@ try:
                 "history_template": "{user}[/INST]{assistant}</s><s>[INST]",
                 "current_message_template": "{user} [/INST]{assistant}",
                 "tokenizer_kwargs": {"add_special_tokens": False},
-                "partial_text_processor": llama_partial_text_processor,
                 "rag_prompt_template": f"""<s> [INST] {DEFAULT_RAG_PROMPT } [/INST] </s>"""
                 + """ 
                 [INST] Question: {question} 
                 Context: {context} 
                 Answer: [/INST]""",
+            },
+            "red-pajama-3b-chat": {
+                # https://huggingface.co/togethercomputer/RedPajama-INCITE-Chat-3B-v1
+                "model_id": "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+                "remote": False,
+                "start_message": "",
+                "history_template": "\n<human>:{user}\n<bot>:{assistant}",
+                "stop_tokens": [29, 0],
+                "current_message_template": "\n<human>:{user}\n<bot>:{assistant}",
+                "rag_prompt_template": f"""{DEFAULT_RAG_PROMPT }"""
+                + """
+                <human>: Question: {question} 
+                Context: {context} 
+                Answer: <bot>""",
             },
         },
 
