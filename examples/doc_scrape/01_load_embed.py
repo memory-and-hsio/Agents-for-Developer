@@ -43,7 +43,7 @@ langchain.debug = True
 # typeC : typeC
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
-collection_name = "hsio"
+collection_name = "windows"
 #collection_name = "temp"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
@@ -84,8 +84,8 @@ if __name__ == "__main__":
         print(persist_directory)
         print("already embedded articles. Please remove the directory first.  if not it'll be appended")
 
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=200)
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
 
     all_documents = []
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         results = vectorstore.get( where={"$and": [{"source": metadata["source"]}, {"page": metadata["page"]}]}, include=["metadatas"],)
         if len(results["ids"]) > 0:
             print(f"Already embedded {metadata}")
-            continue
+            #continue
 
         retriever.add_documents(split_doc, ids=None)
         vectorstore.persist()

@@ -48,7 +48,7 @@ from dotenv import load_dotenv
 # typeC : typeC
 DOC_ROOT = f".\\article\\"
 VS_ROOT = f".\\persistent\\"
-collection_name = "hsio"
+collection_name = "windows"
 
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
@@ -154,13 +154,13 @@ def GPT_demo(retriever):
             combine_docs_chain=reduce_documents_chain,
         )
 
-
         # initialize the LLM tool
         retrieval_tool = Tool(
-            name='PCIe, CXL, NVMe and High speed I/O Expert',
+            name='OS, windows, kernel, system, device driver programming Expert',
             func=retrieval_qa.invoke,
-            description='Use this tool for PCIe, CXL, NVMe and High speed I/O related queries'
+            description='Use this tool for windows OS, system programming, device driver, filter driver queries'
         )
+
 
         llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=False)
 
@@ -200,7 +200,7 @@ def GPT_demo(retriever):
         if "messages" not in st.session_state.keys():
             st.session_state.messages = [
                 {"role": "assistant", 
-                 "content": "Hi, I am JW, an expert on PCIe and CXL domain. feel free to ask questions."}
+                 "content": "Hi, I am Winnie, an expert on windows OS and system programming. feel free to ask questions."}
             ]
 
         # display all messages
@@ -255,7 +255,7 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 # get icon from https://emojipedia.org/robot
 st.set_page_config(
-                   page_title="GPT JW", 
+                   page_title="GPT Winnie", 
                    page_icon="🙄",
                    layout="wide")
 # st.markdown("# GPT Demo")
@@ -292,11 +292,11 @@ st.write("")
 # st.sidebar.header("GPT Demo")
 st.markdown(
     """
-        JW is an expert on PCIe and CXL domain. feel free to ask questions.
+        Winnie is an expert on windows OS and system programming.  feel free to ask questions.
 
-        - PCIe spec
-        - CXL spec
-        - NVMe spec
+        - windows OS
+        - device driver
+        - system programming
         
         """
 )
@@ -308,8 +308,8 @@ else:
     st.write("INFO: embedded database found.")
 
     
-parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=20)
-child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
+parent_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=200)
+child_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
 
 # create embeddings for all the documents
 # https://python.langchain.com/docs/integrations/text_embedding/openai
