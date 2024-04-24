@@ -154,13 +154,13 @@ def GPT_demo(retriever):
             combine_docs_chain=reduce_documents_chain,
         )
 
+
         # initialize the LLM tool
         retrieval_tool = Tool(
             name='PCIe, CXL, NVMe and High speed I/O Expert',
             func=retrieval_qa.invoke,
             description='Use this tool for PCIe, CXL, NVMe and High speed I/O related queries'
         )
-
 
         llm_math_chain = LLMMathChain.from_llm(llm=llm, verbose=False)
 

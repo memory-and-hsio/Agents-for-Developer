@@ -189,7 +189,7 @@ try:
         task="text-generation",
         backend="openvino",
         model_kwargs={"device": llm_device_id, "ov_config": ov_config},
-        pipeline_kwargs={"max_new_tokens": 1000},
+        pipeline_kwargs={"max_new_tokens": 512},
     )
 
 
@@ -203,7 +203,7 @@ try:
     #chain = prompt | ov_llm
     chain = LLMChain(llm=ov_llm, prompt=prompt)
 
-    question = "what is earth?"
+    question = "i can fly and i can swim. what am i?"
 
     print(chain.invoke({"question": question}))
     exit(0)

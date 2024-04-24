@@ -15,4 +15,6 @@ codegen.log
 
 persistent
 model
-article
+
+examples\model
+examples\models

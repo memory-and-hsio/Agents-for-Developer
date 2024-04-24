@@ -63,8 +63,8 @@ vectorstore,search_type="similarity",k=4,score_threshold=None
 # typeC : typeC
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
-collection_name = "hsio"
-collection_name = "temp"
+#collection_name = "hsio"
+collection_name = "windows"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
 local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
@@ -80,8 +80,8 @@ if __name__ == "__main__":
     #load OPENAI API key
     load_dotenv()
     
-    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=200)
-    child_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    parent_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=200)
+    child_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=100)
 
     # create embeddings for all the documents
     # https://python.langchain.com/docs/integrations/text_embedding/openai
@@ -118,9 +118,8 @@ if __name__ == "__main__":
     #retriever = Vectorstore_backed_retriever(vectorstore, search_type="similarity",k=8)
     #retriever = Vectorstore_backed_retriever(vectorstore, search_type="mmr",k=8)
 
-    #print(vectorstore.similarity_search("what is FunnyIO?"))
+    #print(vectorstore.similarity_search("Installing a Driver Programmatically"))
     #print(vectorstore.max_marginal_relevance_search("what is FunnyIO?", k = 3, fetch_k = 30))
-
     print("total", vectorstore._collection.count(), "in the collection")
 
     if os.getenv('USE_OLLAMA') == 'True':
