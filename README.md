@@ -1,5 +1,12 @@
 ## Template for creating your GPT with Streamlit and OpenAI API
 
+Purpose of this prj is to build AI driven domain expert agent for following area
+- Multimedia
+- Storage
+- Memory and HSIO
+- Embedded Controller software
+- Type C and PD
+- Hardware
 
 ### Demo App
 Demo (https://agents-for-developer-4husx9zyu35s9raom7wtig.streamlit.app/)
@@ -7,7 +14,7 @@ Demo (https://agents-for-developer-4husx9zyu35s9raom7wtig.streamlit.app/)
 ### Prerequisites
 1. Python 3.6 or above
 2. An OpenAI API Key ( https://platform.openai.com/apps )
-
+3. An TAVILY API key ( https://app.tavily.com/home )
 
 ### Steps to run the application
 **1. Clone the repository to your local machine:**
@@ -40,7 +47,9 @@ pip install -r requirements.txt
 
 **5. Create a .env file in the root directory of the project and add your OpenAI API key:**
 ```shell
-echo OPENAI_API_KEY=your-api-key > .env
+echo OPENAI_API_KEY=your-openai api-key > .env
+echo TAVILY_API_KEY=your-tavily api-key > .env
+echo HUGGINGFACEHUB_API_TOKEN=your-huggingface token > .env
 ```
 OR
 

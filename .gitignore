@@ -14,7 +14,5 @@ dist
 codegen.log
 
 persistent
-
+model
 article
-
-cache

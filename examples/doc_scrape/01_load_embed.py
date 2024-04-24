@@ -43,8 +43,8 @@ langchain.debug = True
 # typeC : typeC
 DOC_ROOT = f"..\\..\\article\\"
 VS_ROOT = f"..\\..\\persistent\\"
-#collection_name = "hsio"
-collection_name = "temp"
+collection_name = "hsio"
+#collection_name = "temp"
 
 persist_directory = os.path.abspath(VS_ROOT + collection_name + "\\chroma")
 local_store = os.path.abspath(VS_ROOT + collection_name + "\\docstore")
@@ -69,8 +69,8 @@ def create_directory_loader(file_type, path):
     loader_cls = document_loaders.get(file_type)
     if loader_cls is None:
         raise ValueError(f"Unsupported file type: {file_type}")
-    #return DirectoryLoader(path, glob=f"**/*.{file_type}", loader_cls=loader_cls, show_progress=True)
-    return DirectoryLoader(path, glob=f"*.{file_type}", loader_cls=loader_cls, show_progress=True)
+    return DirectoryLoader(path, glob=f"**/*.{file_type}", loader_cls=loader_cls, show_progress=True)
+    #return DirectoryLoader(path, glob=f"*.{file_type}", loader_cls=loader_cls, show_progress=True)
 
 def split_list(input_list, chunk_size):
     for i in range(0, len(input_list), chunk_size):
@@ -133,6 +133,17 @@ if __name__ == "__main__":
             child_splitter=child_splitter,
             parent_splitter=parent_splitter,
         )
+
+        # get medatada from the document and check if it's already embedded
+        metadata = split_doc[0].metadata
+        print(metadata["source"])
+        print(metadata["page"])
+        # check source and page from vectorstore
+        results = vectorstore.get( where={"$and": [{"source": metadata["source"]}, {"page": metadata["page"]}]}, include=["metadatas"],)
+        if len(results["ids"]) > 0:
+            print(f"Already embedded {metadata}")
+            continue
+
         retriever.add_documents(split_doc, ids=None)
         vectorstore.persist()
     #retriever.add_documents(all_documents, ids=None)
